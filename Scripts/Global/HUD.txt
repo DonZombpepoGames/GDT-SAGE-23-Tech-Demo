@@ -40,7 +40,6 @@ reserve function HUD_Draw_Mobile
 // ========================
 
 private function HUD_Draw_Standard
-
 #platform: USE_ORIGINS
 	// temp4 will tell whether to draw lives or coins
 	temp4 = game.coinMode
@@ -101,33 +100,44 @@ private function HUD_Draw_Standard
 			end if
 
 #platform: USE_STANDALONE
-			DrawNumbers(0, 104, 13, player.score, 6, 8, false)
+			DrawNumbers(0, 109, 13, player.score, 6, 8, false)
 #endplatform
 #platform: USE_ORIGINS
 			arrayPos0 = GLOBAL_PLAYERSCORE // VarName[player.score]
 			arrayPos0 += currentPlayer
-			DrawNumbers(0, 104, 13, global[arrayPos0], 6, 8, false)
+			//From here most of the comments are the original hud layouts of sonic 2 aka MD classic crono and CD/cronos layout
+			//DrawNumbers(0, 104, 13, global[arrayPos0], 6, 8, false)
+			DrawNumbers(0, 109, 13, global[arrayPos0], 6, 8, false)
 #endplatform
 
 			if options.gameMode < MODE_TIMEATTACK
+			//if you want to recover the system of one layout for the normal game and one for the time attack
 				// Normal game - only minutes and seconds are shown
-				DrawSpriteScreenXY(14, 67, 29)
-			else
+				//DrawSpriteScreenXY(14, 67, 29)
+			//else
 				// Time attack - draw milliseconds alongside of the other values
-				DrawSpriteScreenXY(13, 67, 29)
-				DrawNumbers(0, 104, 29, stage.milliSeconds, 2, 8, true)
+				//DrawSpriteScreenXY(13, 67, 29)//CD/time attack
+				//DrawNumbers(0, 104, 29, stage.milliSeconds, 2, 8, true)//CD/time attack
+				DrawSpriteScreenXY(13, 71, 29)//mania
+				DrawNumbers(0, 109, 29, stage.milliSeconds, 2, 8, true)//mania
 			end if
 
 			// Rest of the time display
 #platform: USE_STANDALONE
-			DrawNumbers(0, 80, 29, stage.seconds, 2, 8, true)
-			DrawNumbers(0, 56, 29, stage.minutes, 1, 8, true)
-			DrawNumbers(0, 80, 45, player[0].rings, 3, 8, false)
+			//DrawNumbers(0, 80, 29, stage.seconds, 2, 8, true) //CD/time attack
+			//DrawNumbers(0, 56, 29, stage.minutes, 1, 8, true) //CD/time attack
+			//DrawNumbers(0, 80, 45, player[0].rings, 3, 8, false) //CD/time attack
+			DrawNumbers(0, 84, 29, stage.seconds, 2, 8, true) //mania
+			DrawNumbers(0, 59, 29, stage.minutes, 1, 8, true) //mania
+			DrawNumbers(0, 109, 45, player[0].rings, 3, 8, false) //mania
 #endplatform
 #platform: USE_ORIGINS
-			DrawNumbers(0, 80, 29, temp3, 2, 8, true)
-			DrawNumbers(0, 56, 29, temp2, 1, 8, true)
-			DrawNumbers(0, 80, 45, player[currentPlayer].rings, 3, 8, false)
+			//DrawNumbers(0, 80, 29, temp3, 2, 8, true) //CD/time attack
+			//DrawNumbers(0, 56, 29, temp2, 1, 8, true) //CD/time attack
+			//DrawNumbers(0, 80, 45, player[currentPlayer].rings, 3, 8, false) //CD/time attack
+			DrawNumbers(0, 84, 29, temp3, 2, 8, true) //mania
+			DrawNumbers(0, 59, 29, temp2, 1, 8, true) //mania
+			DrawNumbers(0, 109, 45, player[currentPlayer].rings, 3, 8, false) //mania
 #endplatform
 
 			if stage.debugMode == true
@@ -264,18 +274,19 @@ private function HUD_Draw_Mobile
 		end if
 	end if
 
-	DrawNumbers(0, 104, 9, player.score, 6, 8, false)
+	DrawNumbers(0, 109, 13, player.score, 6, 8, false)
 
 	if options.gameMode < MODE_TIMEATTACK
-		DrawSpriteScreenXY(14, 67, 25)
-	else
-		DrawSpriteScreenXY(13, 67, 25)
-		DrawNumbers(0, 104, 25, stage.milliSeconds, 2, 8, true)
+	//to recover the classic huds on mobile, get inspired by the standalone mode above, I'm not going to repeat the code 3 times again XD
+		//DrawSpriteScreenXY(14, 67, 25)
+	//else
+		DrawSpriteScreenXY(13, 71, 29)
+		DrawNumbers(0, 109, 29, stage.milliSeconds, 2, 8, true)
 	end if
 
-	DrawNumbers(0, 80, 25, stage.seconds, 2, 8, true)
-	DrawNumbers(0, 56, 25, stage.minutes, 1, 8, true)
-	DrawNumbers(0, 80, 41, player[0].rings, 3, 8, false)
+	DrawNumbers(0, 84, 29, stage.seconds, 2, 8, true)
+	DrawNumbers(0, 59, 29, stage.minutes, 1, 8, true)
+	DrawNumbers(0, 109, 45, player[0].rings, 3, 8, false)
 
 	if player[0].type == TypeName[Debug Mode]
 		// Player position display, only show it when the player is in Debug Mode (as opposed to Standard's, where it's drawn if Debug Mode is active at all)
@@ -318,9 +329,18 @@ private function HUD_Draw_Mobile
 	else
 		DrawSpriteScreenXY(38, temp1, 8)
 	end if
+	
 	temp1 += 17
 	temp0 += 6
-	DrawSpriteScreenXY(temp0, temp1, 9)
+	if stage.playerListPos <= 3
+		DrawSpriteScreenXY(temp0, temp1, 9)
+	else
+		DrawSpriteScreenXY(39, temp1, 9)
+	end if
+	//original code please dont use that it brokes amy hud lol
+	//temp1 += 17
+	//temp0 += 6
+	//DrawSpriteScreenXY(temp0, temp1, 9)
 
 	temp1 += 5
 	DrawSpriteScreenXY(20, temp1, 18)

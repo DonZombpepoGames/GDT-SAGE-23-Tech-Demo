@@ -1716,14 +1716,8 @@ end function
 
 
 public function Player_HandleRunAnimSpeed
-	player.animationSpeed = player.speed
 
-	if player.animationSpeed < 0
-		FlipSign(player.animationSpeed)
-	end if
-
-	player.animationSpeed *= 80
-	player.animationSpeed /= 0x60000
+	player.animationSpeed = 80
 end function
 
 
@@ -5391,7 +5385,11 @@ event ObjectStartup
 			player[SLOT_PLAYER1].jumpOffset 	= -5
 			player[SLOT_PLAYER1].jumpAbility 	= Player_Action_DblJumpSonic
 			player[SLOT_PLAYER1].actionPeelout = Player_Action_Peelout
-			//ANI_PEELOUT 			= ANI_RUNNING
+			if Player_superState == 1
+				ANI_PEELOUT 			= ANI_RUNNING
+			else
+				ANI_PEELOUT 			= ANI_PEELOUT
+			end if
 			break
 
 		case PLAYER_TAILS_ALONE
@@ -5438,6 +5436,7 @@ event ObjectStartup
 			player[SLOT_PLAYER1].jumpOffset = -1
 			player[SLOT_PLAYER1].jumpAbility 	= Player_Action_DblJumpAmy
 			ANI_PEELOUT 						= ANI_HAMMERDASH
+			player[SLOT_PLAYER1].actionPeelout = Player_Action_Peelout
 			break	
 			
 		end switch
