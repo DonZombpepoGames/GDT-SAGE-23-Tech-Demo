@@ -4122,7 +4122,9 @@ public function Player_State_GlideDrop
 		if player.up == true
            	player.animation = ANI_JUMPING
            	player.state = Player_State_Air
+       	  	end if
 	end if
+end function
 
 
 public function Player_State_GlideSlide
