@@ -1,2 +1,10 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+glew32.dll
+RSDKv4_64.exe
+SData.bin
+SDL2.dll
+UData.bin
+settings.ini
+SonLVL.ini
+SonLVL-RSDK.log
+settings.ini
+log.txt
