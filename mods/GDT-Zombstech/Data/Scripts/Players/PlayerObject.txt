@@ -4075,18 +4075,11 @@ end function
 
 
 public function Player_State_GlideDrop
-//If you want to recurl into a ball when stopping gliding mid-air, remove the comments and use this code instead of the original code below
-//	player.state = Player_State_Air
-//	player.animation = ANI_JUMPING
-
-
-//Original Code
 	if player.gravity == GRAVITY_AIR
 		CallFunction(Player_HandleAirFriction)
 		CallFunction(Player_HandleAirMovement)
 	else
 		if player.timer == 0
-			
 			PlaySfx(SfxName[Landing], false)
 		end if
 
@@ -4096,25 +4089,40 @@ public function Player_State_GlideDrop
 		player.animation = ANI_LOOKINGDOWN
 		player.prevAnimation = ANI_LOOKINGDOWN
 		player.frame = 2
-		//the fucking glide drop spindash help my balls itch
-		if player.animation == ANI_LOOKINGDOWN
-			if player.jumpPress == true
-				glidedropSpindash = 0
-				player.state = Player_State_Spindash
-			end if
-		end if
-		
+//glide drop spindash
 		if player.timer < 16
 			player.timer++
-		else	
-			glidedropSpindash = 0
+			if player.up == 1
+					CallFunction(Player_HandleOnGround)
+					object.state = Player_State_LookUp
+					player.skidding = 0
+			else
+				if player.down == 1
+						CallFunction(Player_HandleOnGround)
+						object.state = Player_State_Crouch
+						player.skidding = 0
+				else
+					if player.jumpPress == 1
+						player.skidding = 0
+						CallFunction(Player_Action_Jump)
+					end if
+				end if
+			end if
+// no glide drop spindash code :(
+		//if player.timer < 16
+			//player.timer++
+		else
 			player.state = Player_State_Ground
 			CallFunction(Player_HandleOnGround)
 			player.skidding = 0
-
 		end if
 	end if
-end function
+//I really hate this thing, not only is it ugly but it also cost a lot to implement and for more it is bugged :').
+	if player.state == Player_State_GlideDrop
+		if player.up == true
+           	player.animation = ANI_JUMPING
+           	player.state = Player_State_Air
+	end if
 
 
 public function Player_State_GlideSlide
