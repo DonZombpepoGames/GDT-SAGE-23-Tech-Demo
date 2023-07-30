@@ -4069,7 +4069,6 @@ public function Player_State_GlideDrop
 		end if
 	end if
 //I really hate this thing, not only is it ugly but it also cost a lot to implement.
-//Glide Cancel, please dont use it
 	if player.state == Player_State_GlideDrop
 		if player.up == true
            	player.animation = ANI_JUMPING
