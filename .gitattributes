@@ -1,10 +1,5 @@
-glew32.dll
-RSDKv4_64.exe
-SData.bin
-SDL2.dll
-UData.bin
-settings.ini
-SonLVL.ini
-SonLVL-RSDK.log
-settings.ini
-log.txt
+# default behaviour
+* text=auto
+
+# S1/2 Script files must ALWAYS use crlf line endings
+*.txt text eol=crlf
