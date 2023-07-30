@@ -3453,13 +3453,29 @@ public function Player_State_Spindash
 		player.abilityTimer = temp0
 		temp1 = false
 	end if
-	
+	if glidedropSpindash == 1
+		temp1 = true
+	end if
+	if temp1 == true
+		if player.jumpPress == true
+			if player.abilityTimer < 0x90000
+				player.abilityTimer += 0x20000
+			else
+				player.abilityTimer = 0x80000
+			end if
+
+			player.frame = 0
+			PlaySfx(SfxName[Charge], false)
+		else
+			temp0 = player.abilityTimer
+			temp0 >>= 5
+			player.abilityTimer -= temp0
+		end if
+	end if	
 	if temp1 == false
 #endplatform
 
-#platform: USE_STANDALONE
-	if player.down == false
-#endplatform
+
 		// Release the spindash!
 
 		player.timer = 0
@@ -4059,33 +4075,45 @@ end function
 
 
 public function Player_State_GlideDrop
-//This part was modified to make the player able to recurl into a ball when glidedropping, and make they able to glide again when recurled
-	player.state = Player_State_Air
-	player.animation = ANI_JUMPING
+//If you want to recurl into a ball when stopping gliding mid-air, remove the comments and use this code instead of the original code below
+//	player.state = Player_State_Air
+//	player.animation = ANI_JUMPING
+
+
 //Original Code
-//	if player.gravity == GRAVITY_AIR
-//		CallFunction(Player_HandleAirFriction)
-//		CallFunction(Player_HandleAirMovement)
-//	else
-//		if player.timer == 0
-//			PlaySfx(SfxName[Landing], false)
-//		end if
-//
-//		player.scrollTracking = false
-//		player.speed = 0
-//		player.xvel = 0
-//		player.animation = ANI_LOOKINGDOWN
-//		player.prevAnimation = ANI_LOOKINGDOWN
-//		player.frame = 2
-//
-//		if player.timer < 16
-//			player.timer++
-//		else
-//			player.state = Player_State_Ground
-//			CallFunction(Player_HandleOnGround)
-//			player.skidding = 0
-//		end if
-//	end if
+	if player.gravity == GRAVITY_AIR
+		CallFunction(Player_HandleAirFriction)
+		CallFunction(Player_HandleAirMovement)
+	else
+		if player.timer == 0
+			
+			PlaySfx(SfxName[Landing], false)
+		end if
+
+		player.scrollTracking = false
+		player.speed = 0
+		player.xvel = 0
+		player.animation = ANI_LOOKINGDOWN
+		player.prevAnimation = ANI_LOOKINGDOWN
+		player.frame = 2
+		//the fucking glide drop spindash help my balls itch
+		if player.animation == ANI_LOOKINGDOWN
+			if player.jumpPress == true
+				glidedropSpindash = 0
+				player.state = Player_State_Spindash
+			end if
+		end if
+		
+		if player.timer < 16
+			player.timer++
+		else	
+			glidedropSpindash = 0
+			player.state = Player_State_Ground
+			CallFunction(Player_HandleOnGround)
+			player.skidding = 0
+
+		end if
+	end if
 end function
 
 
