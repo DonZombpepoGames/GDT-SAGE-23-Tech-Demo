@@ -1,3 +1,10 @@
+
+# default behaviour
+* text=auto
+
+# v4 Script files must ALWAYS use crlf line endings
+*.txt text eol=crlf
+=======
 glew32.dll
 RSDKv4_64.exe
 RSDKv4.exe
@@ -9,3 +16,4 @@ SonLVL.ini
 SonLVL-RSDK.log
 settings.ini
 log.txt
+

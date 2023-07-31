@@ -549,8 +549,17 @@ event ObjectUpdate
 
 			// Player selected the option?
 			if keyPress[0].start == true
-
+//all of this code is the original SS code only comented due this demo dont have SS lol
 				// Special Stage
+				//if object.currentSelection == 21
+				//	PlaySfx(SfxName[Warp], false)
+				//	object.state = MENUCONTROL_LOADSPECIAL
+				//	fadeColor = 208
+				//	fadeColor <<= 16
+				//	temp0 = 255
+				//	temp0 <<= 8
+				//	fadeColor += temp0
+				//	fadeColor += 224
 				if object.currentSelection == 1			
 					stage.activeList = REGULAR_STAGE
 					stage.listPos = 0
@@ -601,7 +610,25 @@ event ObjectUpdate
 		break
 
 	case MENUCONTROL_LOADSPECIAL
-
+	//this is commented from the same reason LOL
+	//	if object.timer < 768
+	//		music.volume -= 10
+	//		object.timer += 8
+	//		SetScreenFade(0xD0, 0xFF, 0xE0, object.timer)
+	//	else
+	//		StopMusic()
+	//		temp0 = object.currentSelection
+	//		temp0 *= 6
+	//		temp0 += 2
+	//		GetTableValue(temp1, temp0, MenuControl_EntryTable)
+	//		temp0++
+	//		GetTableValue(temp2, temp0, MenuControl_EntryTable)
+	//		stage.activeList = temp1
+	//		stage.listPos = temp2
+	//		LoadStage()
+	//		SetScreenFade(0xD0, 0xFF, 0xE0, 0xFF)
+	//	end if
+		
 		break
 		
 	end switch
@@ -613,7 +640,7 @@ event ObjectDraw
 	
 	temp0 = screen.xcenter
 	temp0 -= 10
-	DrawMenu(MENU_1, temp0, 32)
+	DrawMenu(MENU_1, temp0, 16)
 
 	temp0 = screen.xcenter
 	temp0 += 142
@@ -622,8 +649,6 @@ end event
 
 
 event ObjectStartup
-	CreateTempObject(TypeName[Config Screen], 0, 0, 0)
-	MenuControl_optionsMenuOpen = true
 	// Load the sprite sheet
 	// No need to setup sprite frames since using the menu system will handle them automatically
 	LoadSpriteSheet("LevelSelect/Text.gif")
@@ -648,7 +673,7 @@ event ObjectStartup
 	SetupMenu(MENU_1, 0, 3, 1)
 
 	// Add the entries
-	AddMenuEntry(MENU_1, "Template Central Zone", true)
+	AddMenuEntry(MENU_1, "Template", true)
 	AddMenuEntry(MENU_1, " ", false)
 	AddMenuEntry(MENU_1, " ", false)
 	AddMenuEntry(MENU_1, " ", false)
@@ -673,25 +698,25 @@ event ObjectStartup
 	SetupMenu(MENU_2, 0, 3, 1)
 
 	// Add its entries
-	AddMenuEntry(MENU_2, "PRESS START", false)
+	AddMenuEntry(MENU_2, "", true)
 	AddMenuEntry(MENU_2, "", false)
 	AddMenuEntry(MENU_2, "", false)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "", true)
 	AddMenuEntry(MENU_2, " ", false)
 	AddMenuEntry(MENU_2, " ", false)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "", true)
 	AddMenuEntry(MENU_2, " ", false)
 	AddMenuEntry(MENU_2, " ", false)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "", true)
 	AddMenuEntry(MENU_2, " ", false)
 	AddMenuEntry(MENU_2, " ", false)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "", true)
 	AddMenuEntry(MENU_2, " ", 0)
 	AddMenuEntry(MENU_2, " ", 0)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "SPECIAL STAGE@@@", true)
 	AddMenuEntry(MENU_2, " ", false)
 	AddMenuEntry(MENU_2, " ", false)
-	AddMenuEntry(MENU_2, "", false)
+	AddMenuEntry(MENU_2, "SOUND TEST@ *@@*", true)
 
 	menu1.selection = 0
 	menu2.selection = -1
