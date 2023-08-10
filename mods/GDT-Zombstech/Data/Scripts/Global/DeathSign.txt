@@ -1,0 +1,12 @@
+// ----------------------------------
+// RSDK Project: Another Sonic Adventure
+// Script Description: Death Sign Object
+// Script Author: Don Zombpepo
+// ----------------------------------
+
+event ObjectDraw
+	DrawSprite(0)
+end event
+event ObjectStartup
+	LoadSpriteSheet("Global/DeathSign.gif")
+	SpriteFrame(0, 0, 83, 83, 0, 0)
