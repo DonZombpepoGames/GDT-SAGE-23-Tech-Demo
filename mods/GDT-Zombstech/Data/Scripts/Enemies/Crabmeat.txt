@@ -208,7 +208,7 @@ end event
 
 event ObjectStartup
 	CheckCurrentStageFolder("Zone01")
-	if checkResult == false
+	if checkResult == true
 		LoadSpriteSheet("GHZ/Objects.gif")
 		SpriteFrame(-21, -16, 42, 31, 138, 157)
 		SpriteFrame(-22, -16, 44, 31, 98, 189)
