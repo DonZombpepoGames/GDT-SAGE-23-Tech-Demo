@@ -165,8 +165,7 @@ event ObjectUpdate
 			specialStage.emeralds 	= 0
 			specialStage.nextZone 	= 0
 
-			// the Level Select, holy shit :scream: Not needed! because GDT HAS ONLY ONE LEVEL!!!!!
-			
+			// the Level Select, 
 			stage.activeList 		= PRESENTATION_STAGE
 			stage.listPos 			= 2
 			LoadStage()
