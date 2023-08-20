@@ -1,5 +1,5 @@
 // ----------------------------------
-// RSDK Project: RSDK-GDT
+// RSDK Project: RSDK-GDT 
 // Script Description: Player Object Object
 // Script Author: Geared, Klashicola, Twanvanb1, Zombstech
 // ----------------------------------
@@ -352,12 +352,12 @@ public value Player_flyCarryLeaderXPos 	= 0
 public value Player_flyCarryLeaderYPos 	= 0
 public value Player_flyCarryBuddyXPos 	= 0
 public value Player_flyCarryBuddyYPos 	= 0
-
+public value player.dropdashcount0    = 0
+public value player.dropdashcount1    = 0
 public value Player_superState 			= 0
 public value Player_superRingLossTimer 	= 0
 public value Player_superBlendClr 		= 0
 public value Player_superBlendTimer 	= 0
-
 public value Player_attractTable 		= 0
 public value Player_attractTablePos 	= 0
 public value Player_attractTableSize 	= 0
@@ -1716,8 +1716,18 @@ end function
 
 
 public function Player_HandleRunAnimSpeed
+if stage.playerListPos <= 3
+	player.animationSpeed = player.speed
 
+	if player.animationSpeed < 0
+		FlipSign(player.animationSpeed)
+	end if
+
+	player.animationSpeed *= 80
+	player.animationSpeed /= 0x60000
+else
 	player.animationSpeed = 80
+end if
 end function
 
 
@@ -2191,16 +2201,16 @@ public function Player_Action_Jump
 		player.jumpAbilityState = 1
 	end if
 	
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	temp7 = 0
 	CallFunction(Player_SetDropDashCharge)
-#endplatform
+//#endplatform
 end function
 
 public function Player_Action_Peelout	
 	player.state		= Player_State_Peelout
 	player.abilityTimer = 0
-	PlaySfx(SfxName[Peelout Charge], false) 	
+	PlaySfx(SfxName[Charge], false) 	
 end function
 
 
@@ -2259,7 +2269,7 @@ public function Player_State_Peelout
 				FlipSign(player.speed)
 			end if
 
-			PlaySfx(SfxName[Peelout Release], false) 
+			PlaySfx(SfxName[Release], false) 
 		end if
 		CallFunction(Player_HandleOnGround)
 	end if
@@ -2271,7 +2281,7 @@ public function Player_Action_Spindash
 	player.animation = ANI_SPINDASH
 	player.abilityTimer = 0
 	
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	// Don't play the Charge sound effect if using the Drop Dash
 	CheckEqual(player.releasingDropDash, true)
 	temp0 = checkResult
@@ -2281,11 +2291,11 @@ public function Player_Action_Spindash
 	if temp0 == true
 		PlaySfx(SfxName[Charge], false)
 	end if
-#endplatform
+//#endplatform
 
-#platform: USE_STANDALONE
-	PlaySfx(SfxName[Charge], false)
-#endplatform
+//#platform: USE_STANDALONE
+//	PlaySfx(SfxName[Charge], false)
+//#endplatform
 
 	CreateTempObject(TypeName[Dust Puff], player.entityPos, player.xpos, player.ypos)
 	object[tempObjectPos].iypos = player.collisionBottom
@@ -2301,12 +2311,7 @@ public function Player_State_Transform
 
 	player.timer--
 	if player.timer == 0
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		player.animation = ANI_WALKING
 	end if
 end function
@@ -2353,12 +2358,7 @@ public function Player_State_BubbleBounce
 	temp0 |= checkResult
 
 	if temp0 == true
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 	else
 		if player.gravity == GRAVITY_AIR
 			CallFunction(Player_HandleAirMovement)
@@ -2483,9 +2483,15 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_NORMAL
+					if music.currentTrack == TRACK_INVINCIBLE
+						CallFunction(Player_SetDropDashCharge)
+					endif
 					break
 
 				case SHIELD_BUBBLE
+					if music.currentTrack == TRACK_INVINCIBLE
+						CallFunction(Player_SetDropDashCharge)
+					endif
 					PlaySfx(SfxName[Bubble Bounce], false)
 					player.yvel = 0x80000
 					player.xvel = 0
@@ -2496,6 +2502,9 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_FIRE
+					if music.currentTrack == TRACK_INVINCIBLE
+						CallFunction(Player_SetDropDashCharge)
+					endif
 					PlaySfx(SfxName[Fire Dash], false)
 					GetBit(temp0, player.direction, 0)
 					if temp0 == FLIP_NONE
@@ -2522,6 +2531,9 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_LIGHTNING
+					if music.currentTrack == TRACK_INVINCIBLE
+						CallFunction(Player_SetDropDashCharge)
+					endif
 					PlaySfx(SfxName[Lightning Jump], false)
 					player.yvel = -0x58000
 					player.jumpAbilityState = 2
@@ -2677,7 +2689,7 @@ end function
 
 // Handles activating the Drop Dash (Check Player_State_Air or Player_State_RollJump for releasing it)
 public function Player_HandleDropDash
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	if player.releasingDropDash == false
 		CallFunction(Player_GetDropDashCharge)
 		if temp7 >= 0
@@ -2692,7 +2704,6 @@ public function Player_HandleDropDash
 					temp0 &= checkResult
 					CheckNotEqual(player.shield, SHIELD_LIGHTNING)
 					temp0 &= checkResult
-					
 					if temp0 == true
 						temp7 = 1
 					else
@@ -2718,31 +2729,31 @@ public function Player_HandleDropDash
 			CallFunction(Player_SetDropDashCharge)
 		end if
 	end if
-#endplatform
+//#endplatform
 end function
 
 // Yes, this is actually how Sonic Team programmed this
 // Note about these next two functions, player.dropdashCount0 and player.dropdashCount1 are global variables, NOT object values
 
 public function Player_SetDropDashCharge
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	if player.entityPos == SLOT_PLAYER1
 		player.dropdashCount0 = temp7
 	else
 		player.dropdashCount1 = temp7
 	end if
-#endplatform
+//#endplatform
 end function
 
 
 public function Player_GetDropDashCharge
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	if player.entityPos == SLOT_PLAYER1
 		temp7 = player.dropdashCount0
 	else
 		temp7 = player.dropdashCount1
 	end if
-#endplatform
+//#endplatform
 end function
 
 
@@ -3113,12 +3124,12 @@ end function
 
 // Prevents the player from using the Drop Dash if they went in midair without jumping
 public function Player_State_Air_NoDropDash
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	temp7 = -1
 	CallFunction(Player_SetDropDashCharge)
 	player.state = Player_State_Air_NoDropDash
 	CallFunction(Player_State_Air)
-#endplatform
+//#endplatform
 end function
 
 
@@ -3193,7 +3204,7 @@ public function Player_State_Air
 			end if
 		end if
 	else
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 		player.state = Player_State_Ground
 		CallFunction(Player_HandleOnGround)
 		player.skidding = 0
@@ -3214,7 +3225,7 @@ public function Player_State_Air
 			CallFunction(Player_HandleOnGround)
 			player.skidding = 0
 		end if
-#endplatform
+//#endplatform
 	end if
 end function
 
@@ -3237,12 +3248,7 @@ public function Player_State_Roll
 	CallFunction(Player_HandleRollDeceleration)
 
 	if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		player.timer = 0
 		CallFunction(Player_HandleAirMovement)
 	else
@@ -3262,9 +3268,9 @@ public function Player_State_RollJump
 //	player.right = false	
 
 	CallFunction(Player_HandleAirFriction)
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	CallFunction(Player_HandleDropDash)
-#endplatform
+//#endplatform
 	
 	if player.gravity == GRAVITY_AIR
 		if player.animation == ANI_JUMPING
@@ -3277,13 +3283,8 @@ public function Player_State_RollJump
 
 		CallFunction(Player_HandleAirMovement)
 	else
-#platform: USE_STANDALONE
-		player.state = Player_State_Ground
-		CallFunction(Player_HandleOnGround)
-		player.skidding = 0
-#endplatform
 
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 		CheckEqual(player.releasingDropDash, false)
 		temp0 = checkResult
 		CallFunction(Player_GetDropDashCharge)
@@ -3300,7 +3301,7 @@ public function Player_State_RollJump
 			CallFunction(Player_HandleOnGround)
 			player.skidding = 0
 		end if
-#endplatform
+//#endplatform
 	end if
 end function
 
@@ -3334,12 +3335,7 @@ public function Player_State_LookUp
 
 		player.animation = ANI_LOOKINGUP
 		if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 			player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-			player.state = Player_State_Air_NoDropDash
-#endplatform
 			player.timer = 0
 		else
 			if player.jumpPress == true
@@ -3379,12 +3375,7 @@ public function Player_State_Crouch
 
 		player.animation = ANI_LOOKINGDOWN
 		if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 			player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-			player.state = Player_State_Air_NoDropDash
-#endplatform
 			player.timer = 0
 		else
 			if player.jumpPress == true
@@ -3397,12 +3388,7 @@ end function
 
 public function Player_State_Spindash
 	if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		player.speed = 0
 	end if
 
@@ -3421,7 +3407,7 @@ public function Player_State_Spindash
 		player.abilityTimer -= temp0
 	end if
 	
-#platform: USE_STANDALONE
+//#platform: USE_STANDALONE
 	temp1 = player.down
 	
 	CheckEqual(player.releasingDropDash, false)
@@ -3453,29 +3439,13 @@ public function Player_State_Spindash
 		player.abilityTimer = temp0
 		temp1 = false
 	end if
-	if glidedropSpindash == 1
-		temp1 = true
-	end if
-	if temp1 == true
-		if player.jumpPress == true
-			if player.abilityTimer < 0x90000
-				player.abilityTimer += 0x20000
-			else
-				player.abilityTimer = 0x80000
-			end if
-
-			player.frame = 0
-			PlaySfx(SfxName[Charge], false)
-		else
-			temp0 = player.abilityTimer
-			temp0 >>= 5
-			player.abilityTimer -= temp0
-		end if
-	end if	
+	
 	if temp1 == false
+//#endplatform
+
+#platform: USE_STANDALONE
+	if player.down == false
 #endplatform
-
-
 		// Release the spindash!
 
 		player.timer = 0
@@ -3627,12 +3597,7 @@ end function
 
 public function Player_State_Carried
 	if player[1].state != Player_State_Fly
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 	end if
 
 	temp0 = player[1].xpos
@@ -3650,12 +3615,7 @@ public function Player_State_Carried
 		if player.gravity == GRAVITY_GROUND
 			player.state = Player_State_Ground
 		else
-#platform: USE_STANDALONE
 			player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-			player.state = Player_State_Air_NoDropDash
-#endplatform
 		end if
 	end if
 
@@ -3803,14 +3763,16 @@ public function Player_State_Fly
 		CallFunction(Player_HandleOnGround)
 	end if
 //Flight Cancel code
-	if player.state == Player_State_Fly
-		if player.down == true
-			if player.isSidekick == false
-				player.animation = ANI_JUMPING
-				player.state = Player_State_Air			
+	if player.isSidekick == false
+		if player.state == Player_State_Fly
+        	if player.down == true
+				if player.jumpPress == true
+            	player.animation = ANI_JUMPING
+            	player.state = Player_State_Air
+        		end if
 			end if
 		end if
-	end if
+    end if
 end function
 
 
@@ -4117,12 +4079,12 @@ public function Player_State_GlideDrop
 			player.skidding = 0
 		end if
 	end if
-//I really hate this thing, not only is it ugly but it also cost a lot to implement and for more it is bugged :').
+//I really hate this thing, not only is it ugly but it also cost a lot to implement.
 	if player.state == Player_State_GlideDrop
 		if player.up == true
            	player.animation = ANI_JUMPING
            	player.state = Player_State_Air
-       	  	end if
+       	end if
 	end if
 end function
 
@@ -4350,12 +4312,7 @@ public function Player_State_LedgePullUp
 		else
 			player.timer = 0
 			player.animation = ANI_STOPPED
-#platform: USE_STANDALONE
 			player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-			player.state = Player_State_Air_NoDropDash
-#endplatform
 			player.ypos -= 0xA0000
 			player.tileCollisions = true
 		end if
@@ -4746,12 +4703,7 @@ public function Player_State_Death
 					PlayMusic(TRACK_GAMEOVER)
 					stage.pauseEnabled = false
 				else
-#platform: USE_STANDALONE
 					player.state		= Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-					player.state		= Player_State_Air_NoDropDash
-#endplatform
 					player.rings 		= 0
 					player.priority 	= PRIORITY_ACTIVE
 					player.gravity 		= 1
@@ -4897,12 +4849,7 @@ public function Player_State_Drown
 					end if
 				end if
 			else
-#platform: USE_STANDALONE
 				player.state		= Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-				player.state		= Player_State_Air_NoDropDash
-#endplatform
 				player.rings 		= 0
 				player.priority 	= PRIORITY_ACTIVE
 				player.gravity 		= 1
@@ -4980,12 +4927,7 @@ public function Player_State_HangBar
 	Get16x16TileInfo(temp0, temp1, temp2, TILEINFO_ANGLEB)
 	if temp0 != 3 // this is the bar tile flag value
 		// and even if this function isn't used in Origins they still updated it there lol
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		player.speed = 0
 		player.animationSpeed = 0
 		player.yvel = 0
@@ -5096,12 +5038,7 @@ end function
 
 public function Player_State_Waterslide
 	if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		player.angle = 0
 		player.collisionMode = CMODE_FLOOR
 		player.timer = 0
@@ -5259,14 +5196,12 @@ event ObjectUpdate
 		
 		currentPlayer = player.entityPos
 		
-#platform: USE_STANDALONE
-		// Set Sonic to always use the full ball sprite while drop dashing
+//#platform: USE_STANDALONE
 		CallFunction(Player_GetDropDashCharge)
-		
 		if temp7 >= 20
 			player.animation = 39
 		end if
-#endplatform
+//#endplatform
 
 		ProcessAnimation()
 
@@ -5436,11 +5371,13 @@ event ObjectStartup
 			player[SLOT_PLAYER1].jumpOffset 	= -5
 			player[SLOT_PLAYER1].jumpAbility 	= Player_Action_DblJumpSonic
 			player[SLOT_PLAYER1].actionPeelout = Player_Action_Peelout
-			if Player_superState == 1
-				ANI_PEELOUT 			= ANI_RUNNING
-			else
-				ANI_PEELOUT 			= ANI_PEELOUT
-			end if
+			//ANI_PEELOUT 			= ANI_RUNNING //If you want to disable the peelout animation uncomment this
+			//If you want to disable supersonic peelout animation uncomment this
+			//if Player_superState == 1
+				//ANI_PEELOUT 			= ANI_RUNNING
+			//else
+				//ANI_PEELOUT 			= ANI_PEELOUT
+			//end if
 			break
 
 		case PLAYER_TAILS_ALONE
@@ -5450,6 +5387,7 @@ event ObjectStartup
 			LoadAnimation("Tails.ani")
 			player[SLOT_PLAYER1].jumpOffset = -1
 			player[SLOT_PLAYER1].actionPeelout = Player_Action_Jump
+
 			if options.vsMode == true
 				// Tails can always fly in 2P VS, regardless of the setting
 				options.tailsFlight = true
@@ -5473,6 +5411,7 @@ event ObjectStartup
 			ANI_PEELOUT 						= ANI_RUNNING
 			//this part was added for knux and tails because before, if you pressed up and jump playing with one of them, they just keeped looking up because they did not had a Peelout action check
 			player[SLOT_PLAYER1].actionPeelout = Player_Action_Jump
+			
 			// Note this check is actually bugged, this only checks for the last three save slots, ignoring the first one
 			// Also yes this check is still in Origins LOL
 			// It only works perchance, as per the bug listed right above
@@ -5487,10 +5426,7 @@ event ObjectStartup
 			player[SLOT_PLAYER1].character		= 3
 			player[SLOT_PLAYER1].jumpOffset = -1
 			player[SLOT_PLAYER1].jumpAbility 	= Player_Action_DblJumpAmy
-
-			//set ANI_PEELOUT to ANI_HAMMERDASH because Amy does the hammerdash when running at max speed
 			ANI_PEELOUT 						= ANI_HAMMERDASH
-			//let her perform the peelout like Sonic
 			player[SLOT_PLAYER1].actionPeelout = Player_Action_Peelout
 			break	
 			

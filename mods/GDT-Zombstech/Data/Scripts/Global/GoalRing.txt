@@ -35,7 +35,6 @@ event ObjectUpdate
 	if object.value39 == 1
 		object.value40++
 		object.value9 += 8
-			PlaySfx(SfxName[Sign Post], false)
 			object[30].type = TypeName[Act Finish]
 			object[30].drawOrder = 6
 			object[30].priority = PRIORITY_ACTIVE
