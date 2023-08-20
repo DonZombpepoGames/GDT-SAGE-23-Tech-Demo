@@ -757,25 +757,24 @@ public function Player_HandleSuperPalette_Amy
 	if Player_superState == SUPERSTATE_SUPER
 		Player_superBlendTimer++
 		if Player_superBlendTimer >= 12
-			Player_superBlendTimer = 9
+			Player_superBlendTimer = 0
 
-			Player_superBlendClr += 3
-			if Player_superBlendClr >= 30
-				Player_superBlendTimer = 0
+			Player_superBlendClr += 4
+			if Player_superBlendClr >= 24
 				Player_superBlendClr = 0
 			end if
 		end if
 	else
-		if Player_superBlendClr > 15
+		if Player_superBlendClr > 12
 			FlipSign(Player_superBlendClr)
-			Player_superBlendClr += 30
+			Player_superBlendClr += 24
 		end if
 
 		Player_superBlendTimer++
 		if Player_superBlendTimer >= 12
 			Player_superBlendTimer = 0
 
-			Player_superBlendClr -= 3
+			Player_superBlendClr -= 4
 			if Player_superBlendClr <= 0
 				Player_superBlendClr = 0
 				Player_superState = SUPERSTATE_NONE
@@ -798,9 +797,9 @@ public function Player_HandleSuperPalette_Amy
 	temp1++
 
 	GetTableValue(temp0, temp1, Player_AmySuperPal)
-	SetPaletteEntry(0, 54, temp0)
+	SetPaletteEntry(0, 52, temp0)
 	GetTableValue(temp0, temp1, Player_AmySuperAltPal)
-	SetPaletteEntry(1, 54, temp0)
+	SetPaletteEntry(1, 52, temp0)
 end function
 
 public function Player_UpdatePhysicsState
