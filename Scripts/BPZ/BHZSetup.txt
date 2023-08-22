@@ -146,6 +146,7 @@ event ObjectDraw
 end event
 
 event ObjectStartup
+	LoadPalette("DDZ.act", 0, 0, 0, 256)
 	SetMusicTrack("Bluprint.ogg", 0, MUSIC_LOOP_Blueprint)
 	SpeedUpMusic = BlueprintSetup_SpeedUpMusic
 	SlowDownMusic = BlueprintSetup_SlowDownMusic
