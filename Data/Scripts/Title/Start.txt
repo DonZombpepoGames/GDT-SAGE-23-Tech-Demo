@@ -84,10 +84,10 @@ event ObjectUpdate
 				if checkResult > 0
 					object.state = START_LEVELSELECT
 				else
-					object.state = START_NEWGAME
+					object.state = START_LEVELSELECT
 				end if
 			else
-				object.state = START_NEWGAME
+				object.state = START_LEVELSELECT
 			end if
 
 			PlaySfx(SfxName[Menu Select], false)
@@ -165,8 +165,10 @@ event ObjectUpdate
 			specialStage.emeralds 	= 0
 			specialStage.nextZone 	= 0
 
-			// the Level Select, holy shit :scream: Not needed! because GDT HAS ONLY ONE LEVEL!!!!!
-			LoadStage(TITLE SCREEN)
+			// the Level Select, 
+			stage.activeList 		= PRESENTATION_STAGE
+			stage.listPos 			= 2
+			LoadStage()
 		end if
 		SetScreenFade(0x00, 0x00, 0x00, object.timer)
 		break
