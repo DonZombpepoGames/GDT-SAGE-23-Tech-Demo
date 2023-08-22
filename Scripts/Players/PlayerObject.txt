@@ -757,24 +757,25 @@ public function Player_HandleSuperPalette_Amy
 	if Player_superState == SUPERSTATE_SUPER
 		Player_superBlendTimer++
 		if Player_superBlendTimer >= 12
-			Player_superBlendTimer = 0
+			Player_superBlendTimer = 9
 
-			Player_superBlendClr += 4
-			if Player_superBlendClr >= 24
+			Player_superBlendClr += 3
+			if Player_superBlendClr >= 30
+				Player_superBlendTimer = 0
 				Player_superBlendClr = 0
 			end if
 		end if
 	else
-		if Player_superBlendClr > 12
+		if Player_superBlendClr > 15
 			FlipSign(Player_superBlendClr)
-			Player_superBlendClr += 24
+			Player_superBlendClr += 30
 		end if
 
 		Player_superBlendTimer++
 		if Player_superBlendTimer >= 12
 			Player_superBlendTimer = 0
 
-			Player_superBlendClr -= 4
+			Player_superBlendClr -= 3
 			if Player_superBlendClr <= 0
 				Player_superBlendClr = 0
 				Player_superState = SUPERSTATE_NONE
@@ -797,9 +798,9 @@ public function Player_HandleSuperPalette_Amy
 	temp1++
 
 	GetTableValue(temp0, temp1, Player_AmySuperPal)
-	SetPaletteEntry(0, 52, temp0)
+	SetPaletteEntry(0, 54, temp0)
 	GetTableValue(temp0, temp1, Player_AmySuperAltPal)
-	SetPaletteEntry(1, 52, temp0)
+	SetPaletteEntry(1, 54, temp0)
 end function
 
 public function Player_UpdatePhysicsState
@@ -2209,7 +2210,7 @@ end function
 public function Player_Action_Peelout	
 	player.state		= Player_State_Peelout
 	player.abilityTimer = 0
-	PlaySfx(SfxName[Charge], false) 	
+	PlaySfx(SfxName[Peelout Charge], false) 	
 end function
 
 
@@ -2268,7 +2269,7 @@ public function Player_State_Peelout
 				FlipSign(player.speed)
 			end if
 
-			PlaySfx(SfxName[Release], false) 
+			PlaySfx(SfxName[Peelout Release], false) 
 		end if
 		CallFunction(Player_HandleOnGround)
 	end if
@@ -2482,15 +2483,9 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_NORMAL
-					if music.currentTrack == TRACK_INVINCIBLE
-						CallFunction(Player_SetDropDashCharge)
-					endif
 					break
 
 				case SHIELD_BUBBLE
-					if music.currentTrack == TRACK_INVINCIBLE
-						CallFunction(Player_SetDropDashCharge)
-					endif
 					PlaySfx(SfxName[Bubble Bounce], false)
 					player.yvel = 0x80000
 					player.xvel = 0
@@ -2501,9 +2496,6 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_FIRE
-					if music.currentTrack == TRACK_INVINCIBLE
-						CallFunction(Player_SetDropDashCharge)
-					endif
 					PlaySfx(SfxName[Fire Dash], false)
 					GetBit(temp0, player.direction, 0)
 					if temp0 == FLIP_NONE
@@ -2530,9 +2522,6 @@ public function Player_Action_DblJumpSonic
 					break
 
 				case SHIELD_LIGHTNING
-					if music.currentTrack == TRACK_INVINCIBLE
-						CallFunction(Player_SetDropDashCharge)
-					endif
 					PlaySfx(SfxName[Lightning Jump], false)
 					player.yvel = -0x58000
 					player.jumpAbilityState = 2
@@ -2703,6 +2692,7 @@ public function Player_HandleDropDash
 					temp0 &= checkResult
 					CheckNotEqual(player.shield, SHIELD_LIGHTNING)
 					temp0 &= checkResult
+					
 					if temp0 == true
 						temp7 = 1
 					else

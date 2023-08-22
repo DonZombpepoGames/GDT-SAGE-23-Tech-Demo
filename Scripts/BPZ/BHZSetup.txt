@@ -150,8 +150,8 @@ event ObjectStartup
 	SpeedUpMusic = BlueprintSetup_SpeedUpMusic
 	SlowDownMusic = BlueprintSetup_SlowDownMusic
 
-	animalType1 = TypeName[Becky]
-	animalType2 = TypeName[Cucky]
+	animalType1 = TypeName[Flicky]
+	animalType2 = TypeName[Ricky]
 	object[SLOT_ZONESETUP].type = TypeName[Blueprint Setup]
 	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
 
