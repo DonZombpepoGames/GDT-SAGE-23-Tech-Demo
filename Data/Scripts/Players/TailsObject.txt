@@ -20,6 +20,7 @@ private alias object.iypos			 : player.iypos
 private alias object.xvel			 : player.xvel
 private alias object.yvel			 : player.yvel
 private alias object.rotation		 : player.rotation
+private alias object.angle			 : player.angle //mania rotation thing xd
 private alias object.direction		 : player.direction
 private alias object.gravity		 : player.gravity
 private alias object.frame			 : player.frame
@@ -160,7 +161,9 @@ event ObjectUpdate
 			if player.collisionDisabled == false
 				temp0 = player.prevGravity
 				player.prevGravity = player.gravity
+				temp1 = player.rotation //mania rotation
 				ProcessObjectMovement()
+				player.rotation = temp1 //mania rotation
 				player.prevGravity ^= GRAVITY_AIR
 				CheckEqual(player.gravity, GRAVITY_GROUND)
 				player.prevGravity |= checkResult
@@ -182,6 +185,8 @@ event ObjectUpdate
 									end if
 								end if
 							end if
+							player.rotation = player.angle //mania rotation thing
+							player.rotation <<= 1
 						end if
 					end if
 				end if
@@ -212,7 +217,9 @@ event ObjectUpdate
 		if player.collisionDisabled == false
 			temp0 = player.prevGravity
 			player.prevGravity = player.gravity
+			temp1 = player.rotation //mania
 			ProcessObjectMovement()
+			player.rotation = temp1 //mania
 			player.prevGravity ^= GRAVITY_AIR
 			CheckEqual(player.gravity, GRAVITY_GROUND)
 			player.prevGravity |= checkResult
@@ -234,6 +241,8 @@ event ObjectUpdate
 								end if
 							end if
 						end if
+						player.rotation = player.angle //Mania rot
+						player.rotation <<= 1
 					end if
 				end if
 			end if
@@ -312,77 +321,91 @@ event ObjectDraw
 		temp2 = player.rotation
 		if temp1 == false
 			ATan2(player.rotation, player.xvel, player.yvel)
-			player.rotation += 0x10
-			player.rotation &= 0xFF
-			player.rotation >>= 5
-			switch player.rotation
-			case 0
-			case 8
-				temp0 += 5
-				player.rotation = 0x00
-				break
-
-			case 1
-				temp0 += 8
-				if player.direction == FACING_RIGHT
-					player.rotation = 0x40
-				else
-					player.rotation = 0x00
+			//Mania rotation
+			player.rotation <<= 1
+				if player.direction == FACING_LEFT
+					temp1 = player.rotation
+					temp1 -= 256
+					temp1 &= 511
+					player.rotation = temp1
 				end if
-				break
-
-			case 2
 				temp0 += 5
-				player.rotation = 0x40
-				break
-
-			case 3
-				temp0 += 8
-				if player.direction == FACING_RIGHT
-					player.rotation = 0x80
-				else
-					player.rotation = 0x40
-				end if
-				break
-
-			case 4
+			else
 				temp0 += 5
-				player.rotation = 0x80
-				break
-
-			case 5
-				temp0 += 8
-				if player.direction == FACING_RIGHT
-					player.rotation = 0xC0
-				else
-					player.rotation = 0x80
-				end if
-				break
-
-			case 6
-				temp0 += 5
-				player.rotation = 0xC0
-				break
-
-			case 7
-				temp0 += 8
-				if player.direction == FACING_RIGHT
-					player.rotation = 0x00
-				else
-					player.rotation = 0xC0
-				end if
-				break
-			end switch
-
-			if player.direction == FACING_LEFT
-				player.rotation += 0x80
+				player.rotation = 0
 			end if
-		else
-			temp0 += 5
-			player.rotation = 0x00
-		end if
+			//original code
+			//player.rotation += 0x10
+			//player.rotation &= 0xFF
+			//player.rotation >>= 5
+			//switch player.rotation
+			//case 0
+			//case 8
+				//temp0 += 5
+				//player.rotation = 0x00
+				//break
 
-		player.rotation <<= 1
+			//case 1
+				//temp0 += 8
+				//if player.direction == FACING_RIGHT
+					//player.rotation = 0x40
+				//else
+					//player.rotation = 0x00
+				//end if
+				//break
+
+			//case 2
+				//temp0 += 5
+				//player.rotation = 0x40
+				//break
+
+			//case 3
+				//temp0 += 8
+				//if player.direction == FACING_RIGHT
+					//player.rotation = 0x80
+				//else
+					//player.rotation = 0x40
+				//end if
+				//break
+
+			//case 4
+				//temp0 += 5
+				//player.rotation = 0x80
+				//break
+
+			//case 5
+				//temp0 += 8
+				//if player.direction == FACING_RIGHT
+					//player.rotation = 0xC0
+				//else
+					//player.rotation = 0x80
+				//end if
+				//break
+
+			//case 6
+				//temp0 += 5
+				//player.rotation = 0xC0
+				//break
+
+			//case 7
+				//temp0 += 8
+				//if player.direction == FACING_RIGHT
+					//player.rotation = 0x00
+				//else
+					//player.rotation = 0xC0
+				//end if
+				//break
+			//end switch
+
+			//if player.direction == FACING_LEFT
+				//player.rotation += 0x80
+			//end if
+		//else
+			//temp0 += 5
+			//player.rotation = 0x00
+		//end if
+
+		//player.rotation <<= 1
 		if player.visible == true
 			DrawSpriteFX(temp0, FX_ROTATE, player.xpos, player.ypos)
 		end if

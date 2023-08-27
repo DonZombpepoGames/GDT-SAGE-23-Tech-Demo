@@ -182,8 +182,8 @@ private alias object.collisionPlane	 :	player.collisionPlane
 private alias object.floorSensorC	 :	player.floorSensorC
 private alias object.floorSensorL	 :	player.floorSensorL
 private alias object.floorSensorR	 :	player.floorSensorR
-private alias object.floorSensorC	 :	player.floorSensorLC
-private alias object.floorSensorC	 :	player.floorSensorRC
+private alias object.floorSensorLC	 :	player.floorSensorLC
+private alias object.floorSensorRC	 :	player.floorSensorRC
 private alias object.tileCollisions	 :	player.tileCollisions
 private alias object.priority		 :	player.priority
 
@@ -331,6 +331,8 @@ reserve function Player_LightningHit
 reserve function Player_ProjectileHit
 reserve function Player_SpikeHit
 reserve function Player_Kill
+reserve function Player_HandleGroundRotation //mania rot
+reserve function Player_HandleAirRotation //mania rot
 reserve function Player_HandleRollAnimSpeed
 reserve function Player_HandleWalkAnimSpeed
 reserve function Player_HandleRunAnimSpeed
@@ -1683,6 +1685,133 @@ public function Player_State_Static
 	checkResult = false
 end function
 
+//Mania Rotation
+public function Player_HandleGroundRotation
+	CheckLower(player.angle, 5)
+	temp0 = checkResult
+	CheckGreater(player.angle, 251)
+	temp0 |= checkResult
+	
+	if temp0 == 1
+		CheckLower(player.angle, 17)
+		temp0 = checkResult
+		CheckGreater(player.angle, 231)
+		temp0 |= checkResult
+		
+		if temp0 == 1
+			player.rotation = 0
+		else
+			player.rotation = player.angle
+			player.rotation *= 2
+		end if
+	else // We're in rotation zone act 1 now y'all!!
+		temp0 = player.speed
+		if temp0 < 0
+			FlipSign(temp0)
+		end if
+
+		CheckLower(temp0, 393217) // <= 0x60000
+		temp1 = checkResult
+		temp1++
+
+		CheckLower(player.angle, 17)
+		temp2 = checkResult
+		CheckGreater(player.angle, 231)
+		temp2 |= checkResult
+
+		// the Rotation Buffer
+		if temp2 == 1
+			temp2 = 0
+		else
+			temp2 = player.angle
+			temp2 *= 2
+		end if
+
+		// Rotation itself
+		temp3 = player.rotation
+
+		// Rotation Difference?
+		temp4 = temp2
+		temp4 -= temp3
+
+		// Rotation Buffer the second
+		if temp4 >= 0
+			temp5 = temp2
+			temp5 -= temp3
+		else
+			temp5 = temp3
+			temp5 -= temp2
+		end if
+
+		// Angle
+		arrayPos0 = temp4
+		arrayPos0 += 512
+
+		// Rotation Buffer the fourth
+		if arrayPos0 >= 0
+			temp6 = temp4
+			temp6 += 512
+		else
+			temp6 = temp3
+			temp6 -= temp2
+			temp6 -= 512
+		end if
+
+		// Rotation Buffer the third
+		temp7 = temp3
+		temp7 -= temp2
+		temp7 -= 512
+
+		if temp7 < 0
+			temp7 = temp3
+			temp7 -= temp2
+			temp7 += 512
+		end if
+
+		temp0 = 1
+		if temp5 >= temp7
+			if temp7 < temp6
+				arrayPos0 = temp4
+				arrayPos0 -= 512
+			end if
+		else
+			if temp5 < temp6
+				temp0 = temp4
+				temp0 >>= temp1
+				player.rotation = temp3
+				player.rotation += temp0
+				player.rotation &= 511
+				temp0 = 0
+			end if
+		end if
+
+		if temp0 == 1
+			// give it a Fatality...
+			temp0 = arrayPos0
+			temp0 >>= temp1
+			player.rotation = temp3
+			player.rotation += temp0
+			player.rotation &= 511
+		end if
+	end if
+end function
+
+
+public function Player_HandleAirRotation
+	if player.rotation < 256
+		if player.rotation > 0
+			player.rotation -= 4
+		else
+			player.rotation = 0
+		end if
+	else
+		if player.rotation < 512
+			player.rotation += 4
+		else
+			player.rotation = 0
+		end if
+	end if
+end function
 
 public function Player_HandleRollAnimSpeed
 	if player.character == PLAYER_TAILS_ALONE
@@ -2095,19 +2224,22 @@ public function Player_HandleAirMovement
 	end if
 	player.xvel = player.speed
 
-	if player.rotation < 256
-		if player.rotation > 0
-			player.rotation -= 4
-		else
-			player.rotation = 0
-		end if
-	else
-		if player.rotation < 512
-			player.rotation += 4
-		else
-			player.rotation = 0
-		end if
-	end if
+	CallFunction(Player_HandleAirRotation)//Mania rotation
+	
+// Original code	
+//	if player.rotation < 256
+//		if player.rotation > 0
+//			player.rotation -= 4
+//		else
+//			player.rotation = 0
+//		end if
+//	else
+//		if player.rotation < 512
+//			player.rotation += 4
+//		else
+//			player.rotation = 0
+//		end if
+//	end if
 
 	player.collisionMode = CMODE_FLOOR
 	if player.animation == ANI_JUMPING
@@ -2776,6 +2908,13 @@ end function
 
 
 public function Player_State_Ground
+//Mania rot
+	if player.gravity == GRAVITY_GROUND
+		CallFunction(Player_HandleGroundRotation)
+	else
+		CallFunction(Player_HandleAirRotation)
+	end if
+
 	if player.animation != ANI_SKIDDING
 		temp7 = true
 	else
@@ -2784,12 +2923,12 @@ public function Player_State_Ground
 
 	CallFunction(Player_HandleGroundMovement)
 	if player.gravity == GRAVITY_AIR
-		player.state = Player_State_Air
+		player.state = Player_State_Air_NoDropDash
 		CallFunction(Player_HandleAirMovement)
 	else
 		CallFunction(Player_HandleOnGround)
 		if player.speed == 0
-			if player.collisionMode == 0
+			if player.collisionMode == CMODE_FLOOR
 				switch player.character
 				default
 				case PLAYER_SONIC_ALONE
@@ -2820,7 +2959,7 @@ public function Player_State_Ground
 							end if
 						end if
 
-						if player.direction == 0
+						if player.direction == FACING_RIGHT
 							if player.floorSensorR == false
 								if player.floorSensorC == false
 									player.timer = 0
@@ -2899,7 +3038,7 @@ public function Player_State_Ground
 						if player.floorSensorR == false
 							player.timer = 0
 							player.animation = ANI_FLAILING1
-							if player.direction == 1
+							if player.direction == FACING_LEFT
 								player.prevAnimation = ANI_FLAILING1
 								player.frame = 4
 								player.animationTimer = 0
@@ -2911,7 +3050,7 @@ public function Player_State_Ground
 						if player.floorSensorL == false
 							player.timer = 0
 							player.animation = ANI_FLAILING1
-							if player.direction == 0
+							if player.direction == FACING_RIGHT
 								player.prevAnimation = ANI_FLAILING1
 								player.frame = 4
 								player.animationTimer = 0
@@ -2993,7 +3132,7 @@ public function Player_State_Ground
 			end if
 		end if
 
-		if player.collisionMode == 0
+		if player.collisionMode == CMODE_FLOOR
 			if player.pushing == 2
 				player.animation = ANI_PUSHING
 				player.animationSpeed = 0
@@ -3071,12 +3210,7 @@ end function
 
 public function Player_State_Sleeping
 	if player.gravity == GRAVITY_AIR
-#platform: USE_STANDALONE
 		player.state = Player_State_Air_NoDropDash
-#endplatform
-#platform: USE_ORIGINS
-		player.state = Player_State_Air_NoDropDash
-#endplatform
 		CallFunction(Player_HandleAirMovement)
 	else
 		CallFunction(Player_HandleOnGround)
@@ -3234,6 +3368,13 @@ end function
 
 
 public function Player_State_Roll
+//Mania rot
+	if player.gravity == GRAVITY_GROUND
+		CallFunction(Player_HandleGroundRotation)
+	else
+		CallFunction(Player_HandleAirRotation)
+	end if
+
 	CallFunction(Player_HandleRollDeceleration)
 
 	if player.gravity == GRAVITY_AIR
@@ -5143,7 +5284,9 @@ event ObjectUpdate
 			if player.collisionDisabled == false
 				temp0 = player.prevGravity
 				player.prevGravity = player.gravity
+				temp1 = player.rotation //mania rot
 				ProcessObjectMovement()
+				player.rotation = temp1 //mania rot
 				player.prevGravity ^= GRAVITY_AIR
 				CheckEqual(player.gravity, GRAVITY_GROUND)
 				player.prevGravity |= checkResult
@@ -5167,6 +5310,8 @@ event ObjectUpdate
 									end if
 								end if
 							end if
+							player.rotation = player.angle //mania rot
+							player.rotation <<= 1
 						end if
 					end if
 				end if
@@ -5208,7 +5353,9 @@ event ObjectUpdate
 		if player.collisionDisabled == false
 			temp0 = player.prevGravity
 			player.prevGravity = player.gravity
+			temp1 = player.rotation //mania rot
 			ProcessObjectMovement()
+			player.rotation = temp1 //mania rot
 			player.prevGravity ^= GRAVITY_AIR
 			CheckEqual(player.gravity, GRAVITY_GROUND)
 			player.prevGravity |= checkResult
@@ -5232,6 +5379,8 @@ event ObjectUpdate
 								end if
 							end if
 						end if
+						player.rotation = player.angle
+						player.rotation <<= 1
 					end if
 				end if
 			end if
