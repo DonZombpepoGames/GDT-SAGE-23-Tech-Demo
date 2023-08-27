@@ -392,12 +392,14 @@ end event
 
 event ObjectStartup
 	SetMusicTrack("ActComplete.ogg", TRACK_ACTFINISH, false)
-	SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, 38679)
+	SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, 139263)
+	//SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, 38679)
 	SetMusicTrack("Continue.ogg", TRACK_CONTINUE, false)
 	SetMusicTrack("Boss.ogg", TRACK_BOSS, true)
 	SetMusicTrack("GameOver.ogg", TRACK_GAMEOVER, false)
 	SetMusicTrack("Drowning.ogg", TRACK_DROWNING, false)
-	SetMusicTrack("Super.ogg", TRACK_SUPER, true)
+	SetMusicTrack("Super.ogg", TRACK_SUPER, 164449)
+	//SetMusicTrack("Super.ogg", TRACK_SUPER, true) //original super track code lol
 
 	stage.timeOver = false
 

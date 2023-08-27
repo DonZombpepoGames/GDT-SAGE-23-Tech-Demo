@@ -239,7 +239,6 @@ private alias object.value38 : player.hitboxTop
 private alias object.value41 : player.hitboxRight
 private alias object.value39 : player.hitboxBottom
 private alias object.value42 : player.prevGravity
-private alias object.value43 : player.groundRotation
 
 private alias object.value16 : player.releasingDropDash		// Used in Origins
 
@@ -277,6 +276,7 @@ private alias 2 : VSGAME_FADEOUT
 
 reserve function Player_ProcessUpdate
 reserve function Player_State_Static
+reserve function Player_HandleGroundRot
 reserve function Player_HandleGroundMovement
 reserve function Player_HandleAirFriction
 reserve function Player_HandleAirMovement
@@ -344,7 +344,6 @@ reserve function Player_HandleFlyCarry
 reserve function Player_State_Peelout
 reserve function Player_Action_Peelout
 reserve function Player_Action_DblJumpAmy
-reserve function Player_ManiaRotate
 
 // ========================
 // Static Values
@@ -1685,6 +1684,116 @@ public function Player_State_Static
 	checkResult = false
 end function
 
+public function Player_HandleGroundRot
+	CheckLower(player.angle, 5)
+	temp0 = CheckResult
+	CheckGreater(player.angle, 251)
+	temp0 |= CheckResult
+	
+	if temp0 == 1
+		CheckLower(player.angle, 17)
+		temp0 = CheckResult
+		CheckGreater(player.angle, 231)
+		temp0 |= CheckResult
+		
+		if temp0 == 1
+			player.rotation = 0
+		else
+			player.rotation = player.angle
+			player.rotation *= 2
+		end if
+	else //We're in the rotate zone now boys	
+		temp0 = player.speed
+		if temp0 < 0
+			FlipSign(temp0)
+		end if
+		
+		CheckLower(temp0, 393217) //<= 0x60000
+		temp1 = CheckResult
+		temp1++
+		
+		//if (Angle <= 16 || Angle >= 232)
+		CheckLower(player.angle, 17)
+		temp2 = CheckResult
+		CheckGreater(player.angle, 231)
+		temp2 |= CheckResult
+		
+		//RotationBuffer
+		if temp2 == 1
+			temp2 = 0
+		else
+			temp2 = player.angle
+			temp2 *= 2
+		end if
+
+		//Rotation
+		temp3 = player.rotation
+		
+		//RotationDifference
+		temp4 = temp2
+		temp4 -= temp3
+		
+		//RotationBuffer2
+		if temp4 >= 0
+			temp5 = temp2
+			temp5 -= temp3
+		else
+			temp5 = temp3
+			temp5 -= temp2
+		end if
+		
+		//Angle
+		ArrayPos0 = temp4
+		ArrayPos0 += 512
+		
+		//RotationBuffer4
+		if ArrayPos0 >= 0
+			temp6 = temp4
+			temp6 += 512
+		else
+			temp6 = temp3
+			temp6 -= temp2
+			temp6 -= 512
+		end if
+		
+		//RotationBuffer3
+		temp7 = temp3
+		temp7 -= temp2
+		temp7 -= 512
+		
+		if temp7 < 0
+			temp7 = temp3
+			temp7 -= temp2
+			temp7 += 512
+		end if
+		
+		temp0 = 1
+		if temp5 >= temp7
+			if temp7 < temp6
+				ArrayPos0 = temp4
+				ArrayPos0 -= 512
+			end if
+		else
+			if temp5 < temp6)
+				temp0 = temp4
+				temp0 >>= temp1
+				player.rotation = temp3
+				player.rotation += temp0
+				player.rotation &= 511
+				temp0 = 0
+			end if
+		end if
+		
+		if temp0 == 1
+			//Finalise
+			temp0 = ArrayPos0
+			temp0 >>= temp1
+			player.rotation = temp3
+			player.rotation += temp0
+			player.rotation &= 511
+		end if
+	end if
+end function
 
 public function Player_HandleRollAnimSpeed
 	if player.character == PLAYER_TAILS_ALONE
@@ -2778,6 +2887,12 @@ end function
 
 
 public function Player_State_Ground
+
+	//Rotation
+	if player.gravity == GRAVITY_GROUND
+		CallFunction(Player_HandleGroundRot)
+	end if
+	
 	if player.animation != ANI_SKIDDING
 		temp7 = true
 	else
@@ -3236,6 +3351,11 @@ end function
 
 
 public function Player_State_Roll
+
+	if player.gravity == GRAVITY_GROUND
+		CallFunction(Player_HandleGroundRot)
+	end if
+	
 	CallFunction(Player_HandleRollDeceleration)
 
 	if player.gravity == GRAVITY_AIR
@@ -5123,6 +5243,10 @@ event ObjectUpdate
 				player.jumpAbilityState = 0
 			end if
 
+			temp1 = player.rotation
+			ProcessObjectMovement()
+			player.rotation = temp1
+
 			CallFunction(player.state)
 			
 			// The Origins folks didn't put the Drop Dash "animation" code here...
@@ -5204,6 +5328,8 @@ event ObjectUpdate
 					camera[currentPlayer].adjustY = 0
 					player.iypos += player.jumpOffset
 				end if
+				player.rotation = player.angle
+				player.rotation <<= 1
 			end if
 		end if
 
@@ -5281,11 +5407,6 @@ end event
 
 
 event ObjectDraw
-		if temp0 == 1
-			object.value2++
-			object.value2 %= 8
-		
-			DrawSpriteFX(object.value2 , FX_FLIP, object.xpos, object.ypos)
 	if player.animation != player.prevAnimation
 		// If the player's animation is different than the one they had last frame,
 		// reset all the other animation values too
@@ -5294,78 +5415,10 @@ event ObjectDraw
 		player.animationTimer = 0
 		player.animationSpeed = 0
 	end if
-	
-	CallFunction(Player_ManiaRotate)
-	//DrawObjectAnimation()
+
+	DrawObjectAnimation()
 end event
 
-function Player_ManiaRotate
-	temp0 = player.rotation
-	if object.gravity == GRAVITY_GROUND
-		if object.angle < 0x04
-			player.groundrotation = 0
-		else
-			if object.angle > 0xFC
-				player.groundrotation = 0
-			else
-				temp1 = 0
-				if object.angle > 0x10
-					if object.angle < 0xE8
-						temp1 = object.angle
-						temp1 <<= 1
-					end if
-				end if
-				
-				temp2 = temp1
-				temp2 -= player.groundrotation
-				temp3 = 1
-				temp4 = object.speed
-				abs(temp4)
-				if temp4 <= 0x60000
-					temp3++
-				end if
-				temp4 = temp2
-				abs(temp4)
-				temp5 = temp2
-				temp5 -= 0x200
-				abs(temp5)
-				if temp4 >= temp5
-					temp4 = temp2
-					temp4 += 0x200
-					abs(temp4)
-					if temp5 < temp4
-						temp4 = temp2
-						temp4 -= 0x200
-						temp4 >>= temp3
-						player.groundrotation += temp4
-					else
-						temp4 = temp2
-						temp4 += 0x200
-						temp4 >>= temp3
-						player.groundrotation += temp4
-					end if
-				else
-					temp5 = temp2
-					temp5 += 0x200
-					if temp4 < temp5
-						temp4 = temp2
-						temp4 >>= temp3
-						player.groundrotation += temp4
-					else
-						temp4 = temp2
-						temp4 += 0x200
-						temp4 >>= temp3
-						player.groundrotation += temp4
-					end if
-				end if
-			end if
-		end if
-	end if
-	player.groundrotation &= 0x1FF
-	player.rotation = player.groundrotation
-	DrawObjectAnimation()
-	player.rotation = temp0
-end function
 
 event ObjectStartup
 	playerCount = 0

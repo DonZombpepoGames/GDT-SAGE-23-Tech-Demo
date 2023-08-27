@@ -151,7 +151,7 @@ event ObjectStartup
 	SlowDownMusic = DDZSetup_SlowDownMusic
 
 	animalType1 = TypeName[Flicky]
-	animalType2 = TypeName[Ricky]
+	animalType2 = TypeName[Cucky]
 	object[SLOT_ZONESETUP].type = TypeName[DDZ Setup]
 	object[SLOT_ZONESETUP].priority = PRIORITY_ACTIVE
 
