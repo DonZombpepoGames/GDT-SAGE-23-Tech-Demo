@@ -46,7 +46,7 @@ private alias 2 : MUSICEVENT_FLAG_SLOWDOWN
 
 // Music Loops
 
-private alias 176402 : MUSIC_LOOP_DDZ //it's not the best loop in the world but it works lol
+private alias 1 : MUSIC_LOOP_DDZ
 private alias 1 : MUSIC_LOOP_DDZ_F
 
 private alias 38679  : MUSIC_LOOP_INV
@@ -114,18 +114,18 @@ private function DDZSetup_SlowDownMusic
 		switch music.currentTrack
 		case TRACK_STAGE
 			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
-			SwapMusicTrack("DDZAlt.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ, 12500)
+			SwapMusicTrack("DDZ.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ, 12500)
 			break
 
 		case TRACK_INVINCIBLE
-			SetMusicTrack("DDZAlt.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ)
+			SetMusicTrack("DDZ.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ)
 			SwapMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV, 12500)
 			break
 
 		case TRACK_BOSS
 		case TRACK_DROWNING
 		case TRACK_SUPER
-			SetMusicTrack("DDZAlt.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ)
+			SetMusicTrack("DDZ.ogg", TRACK_STAGE, MUSIC_LOOP_DDZ)
 			SetMusicTrack("Invincibility.ogg", TRACK_INVINCIBLE, MUSIC_LOOP_INV)
 			break
 
@@ -146,7 +146,7 @@ event ObjectDraw
 end event
 
 event ObjectStartup
-	SetMusicTrack("DDZAlt.ogg", 0, MUSIC_LOOP_DDZ)
+	SetMusicTrack("DDZ.ogg", 0, MUSIC_LOOP_DDZ)
 	SpeedUpMusic = DDZSetup_SpeedUpMusic
 	SlowDownMusic = DDZSetup_SlowDownMusic
 
