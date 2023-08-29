@@ -1387,7 +1387,7 @@ public function Player_Kill
 
 #platform: USE_ORIGINS
 		if currentPlayer == camera[currentPlayer].target
-			camera[currentPlayer].style = CAMERASTYLE_EXTENDED
+			camera[currentPlayer].style = CAMERASTYLE_STATIC
 		end if
 #endplatform
 	end if
@@ -2347,8 +2347,13 @@ end function
 
 
 public function Player_State_Peelout
+	if player.direction == FACING_RIGHT
+		Screen.cameraStyle = CAMERASTYLE_EXTENDED_OFFSET_L
+	else
+		Screen.cameraStyle = CAMERASTYLE_EXTENDED_OFFSET_R
+	end if
 	// Cancels the Peel Out, keeps the camera
-	if Player.Gravity == GRAVITY_AIR
+	if player.gravity == GRAVITY_AIR
 
 		player.state = Player_State_Air
 
@@ -2389,7 +2394,7 @@ public function Player_State_Peelout
 	// Release
 	if player.up == false
 		player.scrollDelay = 15
-		screen.camerastyle = CAMERASTYLE_HLOCKED
+		screen.camerastyle = CAMERASTYLE_EXTENDED
 
 		player.state = Player_State_Ground
 		// Cancels the peel out if you didn't charged it enough
@@ -4653,7 +4658,7 @@ public function Player_State_GotHit
 				stage.state = STAGE_FROZEN
 				camera[currentPlayer].enabled = false
 			else
-				camera[currentPlayer].style = CAMERASTYLE_EXTENDED
+				camera[currentPlayer].style = CAMERASTYLE_STATIC
 			end if
 #endplatform
 		end if
@@ -5379,7 +5384,7 @@ event ObjectUpdate
 								end if
 							end if
 						end if
-						player.rotation = player.angle
+						player.rotation = player.angle //mania rot
 						player.rotation <<= 1
 					end if
 				end if
